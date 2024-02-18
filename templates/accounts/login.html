@@ -1,0 +1,61 @@
+<!-- # 163 We will first include our html template(header and footer(base.html)) and then copy the body from our downloaded template and paste it in our {block content}. -->
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y" style="min-height:84vh">
+
+<!-- # 181 we will get the "command" query from the url if it exit then display the verification message else we display the login form -->
+{% if request.GET.command == 'verification' %}  <!-- # 181a ii -->
+<div class="container mx-auto alert alert-info text-center" role="alert" style="max-width: 1024px; margin-top:100px;"> <!-- # 181a iii -->
+  Thank you for registering with us. We have sent a verification email to your email address [{{request.GET.email}}] <!-- # 181a iv -->
+  <br><br> <!-- # 181a v -->
+  Already verified? <a href="{% url 'login' %}"> Login </a> <!-- # 181a vi -->
+  </div> <!-- # 181a iii -->
+{% else %} <!-- #181b Here we will display the login form-->
+    <!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
+
+          <div class="card-body">
+          <h4 class="card-title mb-4">Sign in</h4>
+
+          <!-- # 169 Here we will display login error messages then we will goto # 170 navbar.html to display detail of the logged in user-->
+          {% include 'includes/alerts.html' %}
+
+          <!-- # 165 Next we will add the action and method attribute to the form tag for posting data -->
+          <form action="{% url 'login' %}" method="POST">
+
+            <!-- # 166 We will the add the csrf_token to secure post data -->
+            {% csrf_token %}
+              <div class="form-group">
+
+                <!-- # 167 Next we will provide a name attribute(email) for the email input -->
+                 <input type="email" class="form-control" placeholder="Email Address" name="email">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+
+                 <!-- # 167b we will also provide a name attribute(password) for the password input so we can receive the values in the #168 views.py file of the accounts app -->
+                <input type="password" class="form-control" placeholder="Password" name="password">
+              </div> <!-- form-group// -->
+              
+              <div class="form-group">
+                  <a href="#" class="float-right">Forgot password?</a> 
+               
+              </div> <!-- form-group form-check .// -->
+              <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+              </div> <!-- form-group// -->    
+          </form>
+          </div> <!-- card-body.// -->
+        </div> <!-- card .// -->
+    
+        <!-- # 164 We will add the register link so that when we click on the link, it will take us to the register.html page -->
+         <p class="text-center mt-4">Don't have account? <a href="{% url 'register' %}">Sign up</a></p>
+         <br><br>
+    <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+{% endif %} <!-- # 181c Now we can test our verification. it should be working. Now we will work on making a dashboard so we can see list of saved orders and soon. -->
+            <!-- # 181d To begin creating our dashboard, we will goto url.py # 182 of the account app to create the url path for the dashboard.-->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->    
+
+{% endblock %}

@@ -1,0 +1,114 @@
+<!-- # 134 We will go to the navbar.html # 135 template in the include folder and include the links to the register and login pages. -->
+
+<!-- # 136 We can now include our html template -->
+<!-- # 137 Next we will use django model form to handle the form inputs(create the form). In this case, we will use our Account model: storing the form values in the fields of our Account model -->
+<!-- # 138 To begin, we will create a new file forms.py # 139 in the accounts app  -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+
+    <!-- ============================ COMPONENT REGISTER   ================================= -->
+        <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+          <article class="card-body">
+            <!-- #160 Here we will display the message if there is any message by including the alerts.html file from the template folder -->
+            <!-- Next we will go to the # 161 views.py file of the account app and request a successful message be displayed on sucessful registration. -->
+            {% include 'includes/alerts.html' %}
+            <!-- # 160 ends -->
+            <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
+            <!-- # 141 Now we have our form fields here. So if we type {{ form }} inside the form tag, our default form fields form the account model will appear having a default html that has'nt been styled.-->
+            <!-- # 142 Next we will include an action and method attribute in our html tag then add the csrf_token to secure our form -->
+            <!-- # 143a Next we will replace the html inputs with our Account model fields-->
+            <form action="{% url 'register' %}" method="POST">
+            {% csrf_token %}
+
+            <!-- {{ form }} --> <!-- This displays the forms of the Account model -->
+            <!-- {{ form.as_p }} --> <!-- This adds a paragraph beside each forms-->
+                    <div class="form-row">
+                        <div class="col form-group">
+                            <label>First name</label>
+                            <!-- # 143b Comment and Replace the firstname html input with Account Model field 'first_name' -->
+                              <!-- <input type="text" class="form-control" placeholder=""> -->
+                              {{ form.first_name }}
+                        </div> <!-- form-group end.// -->
+                        <div class="col form-group">
+                            <label>Last name</label>
+                               <!-- # 143c Comment and Replace the lastname html input with Account Model field 'last_name' -->
+                                 <!-- <input type="text" class="form-control" placeholder=""> -->
+                                 {{ form.last_name }}
+                        </div> <!-- form-group end.// -->
+                    </div> <!-- form-row end.// -->
+                   
+                    <!-- # 143d We do not have an Account model field for gender, so we will comment the html code. -->
+
+                    <!-- <div class="form-group">
+                        <label class="custom-control custom-radio custom-control-inline">
+                          <input class="custom-control-input" checked="" type="radio" name="gender" value="option1">
+                          <span class="custom-control-label"> Male </span>
+                        </label>
+                        <label class="custom-control custom-radio custom-control-inline">
+                          <input class="custom-control-input" type="radio" name="gender" value="option2">
+                          <span class="custom-control-label"> Female </span>
+                        </label>
+                    </div> -->
+                    
+                    <!-- form-group end.// -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Email Address</label>
+                            <!-- # 143e Comment and Replace the email html input with Account Model field 'email' -->
+                              <!-- <input type="text" class="form-control" placeholder=""> -->
+                                    {{ form.email }}
+                            <!-- <small class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                        </div> <!-- form-group end.// -->
+
+                        <div class="form-group col-md-6">
+                          <label>Phone Number</label>
+                    <!-- # 143f Comment and Replace the phone number html input with Account Model field 'phone_number' -->
+                    <!-- <input type="text" class="form-control" placeholder=""> -->
+                          {{ form.phone_number }}
+                        </div> <!-- form-group end.// -->
+                    </div> <!-- form-row.// -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Create password</label>
+                    <!-- # 143g Before we display the password and confirm password field, we will go to the forms.py # 144 file to create and modify the password and c_password field -->
+                    <!-- # 145 We can now Comment and Replace the create password html input with the Account Model field 'password' -->
+                            <!-- <input class="form-control" type="password"> -->
+                            {{ form.password }}
+                        </div> <!-- form-group end.// --> 
+                        <div class="form-group col-md-6">
+                            <label>Repeat password</label>
+                    <!-- # 146 We can now Comment and Replace the repeate password html input with the Account Model field 'confirm_password' -->
+                    <!-- # 147 Next we will want to give the inputs the bootstrap style class. To do this we go to the forms.py # 148 -->
+                            <!-- <input class="form-control" type="password"> -->
+                            {{ form.confirm_password }}
+                        </div> <!-- form-group end.// -->  
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block"> Register  </button>
+                    </div> <!-- form-group// -->     
+                    
+                    <!-- # 154 We will display our error here and then go to our browser to test the registration form. -->
+                    <!-- # 155 Next thing we will want to do is to display a sucessful or error message when any occur during registration -->
+                    <!-- To do this, we will use django-messages. for information about django  messages visit (messages in django in google).
+                    By default, django messages is already installed and configured in our # 156 settings.py file.  -->
+                       <!-- {{ form.errors }} --> <!-- handles all field error -->
+                        {{ form.email.errors }} <!-- handles email field error -->
+                        {{ form.non_field_errors }} <!-- handles Non field error -->
+                </form>
+            </article><!-- card-body.// -->
+        </div> <!-- card .// -->
+
+        <!-- # 162 We will add the login link so that when we click on the link, it will take us to the # 163 login.html page -->
+        <p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Log In</a></p>
+        <br><br>
+    <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+{% endblock %}

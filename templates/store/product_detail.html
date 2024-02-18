@@ -1,0 +1,171 @@
+<!-- # 55a We will bring in the base.html file containing our header and footer -->
+
+{% extends 'base.html' %}
+
+<!-- # 55c We will load static to make our images display, then refresh the page-->
+<!-- # 55d We will display the product details using the context value from the view.py file. -->
+<!-- # 55e Next we need to make the products in the home page go to the product-detail page when we click 
+    the product name to view its detail. To do this, we need to ceate a get-url funcion for the home page 
+    same way we created a get-url fuction for the product in each category. To  do this, we will 
+    go to the models.py # 56 file of the store app the create our get-url function-->
+{% load static %}
+
+<!-- # 55b Then we will include the block content (main content) -->
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+    
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+        <div class="row no-gutters">
+            <aside class="col-md-6">
+    <article class="gallery-wrap"> 
+        <div class="img-big-wrap">
+           <a href="#"><img src="{{ single_product.images.url }}"></a>
+        </div> <!-- img-big-wrap.// -->
+        
+    </article> <!-- gallery-wrap .end// -->
+            </aside>
+            <main class="col-md-6 border-left">
+
+      <!-- # 107a We will like to take the product variation(color, size) on the product detail page so when adding products to cart, we will also be adding its variations.
+      # 107a to do the, we will use a form so as we select a variation using a dropdown, we will use the POST method to add the variation to cart. We will also add the {% csrf_token %} to resolve cross-site forgery issues -->
+    <form action="{% url 'add_cart' single_product.id %}" method="POST">
+        {% csrf_token %}       
+    <article class="content-body">
+
+          <!-- # 56 We will now load the single product details (name, price, description) -->
+        <h2 class="title">{{ single_product.product_name }}</h2>
+        <div class="mb-3"> 
+            <var class="price h4">$ {{ single_product.price }}</var> 
+        </div> 
+        <p>{{ single_product.description}}</p>
+        
+        <hr>
+            <div class="row">
+                <div class="item-option-select">
+
+                   <!-- # 107d Here is our dropdown for Color variation. -->
+                    <h6>Choose Color</h6>
+                    <!-- # 110a We will bring our added product variation (color) dynamically from the database -->
+                    <select name="color" id="" class="form-control">
+                    <option value="" disabled selected>Select</option>
+                    <!-- # 110b We use _set.all in the ( single_product.variation_set.all ) to bring all the data(both color and size) from the variation model. 
+                        refresh the browser, you can now see our dynamic variation. But we have to seperate the variation- 
+                        the color show be displayed in the color dropdown, while the size should be displayed in the size dropdown.
+                        To do this seperation, we will create a variation manager in the models.py # 111 file of the store app-->
+
+                    <!-- # 112a We will use the VariationManager() functions (colors() and sizes()) to display our variations independently -->
+                    <!-- # 112b We will display the variation dropdown for colors  -->
+                    {% for i in single_product.variation_set.colors %}
+                      <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                    {% endfor %}
+                    </select> 
+                </div>
+            </div> <!-- row.// -->
+            <div class="row">
+                <div class="item-option-select">
+
+                  <!-- # 107d Here is our dropdown for Size variation. -->
+                  <!-- # 107e Next we will like to get this variations dynamically from the database for this reason we will craete a 
+                    variation model so we can add this variations from the admin site. We will go to the models.py # 108 of the store 
+                    app and create our variation model below the Product class -->
+
+                    <h6>Select Size</h6>
+                    <select name="size" id="" class="form-control">
+                        <option value="" disabled selected>Select</option>
+                    <!-- # 112c We will display the variation dropdown for sizes -->
+                    <!-- # 112d Next we will go to the add_cart() function of the view.py # 113 file of the cart app to receive 
+                        the variations and add them to cart -->
+                    {% for i in single_product.variation_set.sizes %}
+                      <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                    {% endfor %}
+                    </select> 
+                </div>
+            </div> <!-- row.// -->
+            <hr>
+
+            <!-- # 62 We will display an 'out of stock' message when the product is finished. -->
+            <!-- # 63a Next we will create the cart app so that we can handle the cart functionality. To do this, 
+            # 63b in the terminal window, we will run: python manage.py startapp cart
+            # 63c Our carts app will be created then we will go to the (settings.py # 64) file to register the carts app  -->
+            {% if single_product.stock <= 0 %}
+            <h5 class="text-danger">Out of Stock</h5>
+              {% else %}
+
+            <!-- # 95 We will check if the product in the product detail page is already in cart, the button to display 
+              will be 'Added To Cart' and 'View Cart'. Next we will make the cart count on the navbar to display the total
+              number of items in the cart. To do this we will create a new file named context-processor.py # 96 in the cart app -->
+
+              <!-- # 107c(ii) We will comment the added to cart anchor and view cart anchor -->
+                <!-- { if in_cart }
+                <a href="#" class="btn  btn-success"> <span class="text">Added To Cart</span> <i class="fas fa-check"></i>  </a>
+                <a href="{% url 'cart' %}" class="btn  btn-outline-primary"> <span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
+                { else }  -->
+              <!-- # end 107c(ii) -->
+                
+
+            <!-- # 77a We will include the add_cart() method to the 'add to cart' button and also passing a parameter (product_id). 
+                when we click the 'add to cart' button now, you will see that we route to the cart page, but the cartitem
+                information is not being displayed -->
+            <!-- # 77b Next we will go modify the cart function in the views.py # 78 to get the total amount and cart_items so we can display them in the cart page -->
+
+            <!-- # 107b We will comment the anchor tage(a) to change it to a button so we can post the variation -->
+            <!-- <a href="{% url 'add_cart' single_product.id %}" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a> -->
+
+            <!-- # 107c We will use a button to post the variations(color, size) to the action=" {% url 'add_cart' single_product.id %} " then we will comment the 'added to cart' button-->
+                <button type="submit" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+
+            <!-- # 107c(iii) comment code
+                { endif }
+                end # 107c(iii) -->
+
+            {% endif %}
+    </article> <!-- product-info-aside .// -->
+  </form>
+  <!-- # 107a form tag closes -->
+
+
+            </main> <!-- col.// -->
+        </div> <!-- row.// -->
+    </div> <!-- card.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    
+    <br>
+    
+    <div class="row">
+                <div class="col-md-9">
+    
+        <header class="section-heading">
+            <h3>Customer Reviews </h3>  
+            
+        </header>
+    
+        <article class="box mb-3">
+            <div class="icontext w-100">
+                <img src="{% static './images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
+                <div class="text">
+                    <span class="date text-muted float-md-right">24.04.2020 </span>  
+                    <h6 class="mb-1">Mike John </h6>
+                    
+                </div>
+            </div> <!-- icontext.// -->
+            <div class="mt-3">
+                <p>
+                    Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip
+                </p>	
+            </div>
+        </article>
+    
+        
+    
+        </div> <!-- col.// -->
+    </div> <!-- row.// -->
+    
+    
+    </div> <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+{% endblock %}

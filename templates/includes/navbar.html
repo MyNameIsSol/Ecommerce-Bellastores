@@ -1,0 +1,127 @@
+{% load static %}
+<header class="section-header">
+    <nav class="navbar p-md-0 navbar-expand-sm navbar-light border-bottom">
+    <div class="container">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop4" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarTop4">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                 <a href="#" class="nav-link">   English </a>
+                
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link"> USD </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav">
+            <li><a href="#" class="nav-link"> <i class="fa fa-envelope"></i> Email </a></li>
+            <li><a href="#" class="nav-link"> <i class="fa fa-phone"></i> Call us </a></li>
+        </ul> <!-- list-inline //  -->
+      </div> <!-- navbar-collapse .// -->
+    </div> <!-- container //  -->
+    </nav>
+    
+    <section class="header-main border-bottom">
+        <div class="container">
+    <div class="row align-items-center">
+        <div class="col-lg-2 col-md-3 col-6">
+
+    <!-- # 58a We should route the Logo to the home page. Then we will go to 
+        the home.html # 59 to route the (See All) url-->
+            <a href="{% url 'home' %}" class="brand-wrap">
+                <img class="logo" src="{% static './images/logo.png' %}">
+            </a> <!-- brand-wrap.// -->
+        </div>
+        <div class="col-lg col-sm col-md col-6 flex-grow-0">
+            <div class="category-wrap dropdown d-inline-block float-right">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> 
+                    <i class="fa fa-bars"></i> All category 
+                </button>
+                <div class="dropdown-menu">
+                    <!-- # 49c link to all the products in the store webpage -->
+                    <a class="dropdown-item" href="{% url 'store' %}">All Products</a>
+
+                <!-- # 49a we will list the categories in the dropdown menu -->
+
+                    {% for category in links %}
+                <!-- # 49b We will use a slug of category in the href attribute by passing a function 'slug_url()' 
+                    in the href. Then we will go create the function in the model.py #50 file of the catigory app -->
+                    <a class="dropdown-item" href="{{ category.get_url }}">{{ category.category_name }}</a>
+                    {% endfor %}
+                </div>
+            </div>  <!-- category-wrap.// -->
+        </div> <!-- col.// -->
+
+        <!-- # 49c link to all the products in the store webpage -->
+        <a href="{% url 'store' %}" class="btn btn-outline-primary">Store</a>
+
+        <!-- # 104a Here we will add the search url to the action attribute action="{% url 'search' %}" then the method="GET" -->
+        <div class="col-lg  col-md-6 col-sm-12 col">
+            <form action="{% url 'search' %}" class="search" method="GET">
+                <div class="input-group w-100">
+
+                <!-- # 104b In the input, we will give a name(attribute)="keyword" -->
+                    <input type="text" class="form-control" style="width:60%;" placeholder="Search" name="keyword">
+                    
+                    <div class="input-group-append">
+
+                    <!-- # 104c We will also make sure the button has a type="submit" 
+                        # 104d Then we will go to the store.html # 105 and 
+                        make the 'Our Store' text change 'Search Result' when we make a product search -->
+                      <button class="btn btn-primary" type="submit">
+                        <i class="fa fa-search"></i>
+                      </button>
+
+                    </div>
+                </div>
+            </form> <!-- search-wrap .end// -->
+        </div> <!-- col.// -->
+        <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
+                    <div class="d-flex justify-content-end mb-3 mb-lg-0">
+
+                        <!-- # 170 Here we will display detail of the user who logged in using an if condition --> 
+                        <!-- # 170b We will also change 'guest' to 'user.first_name' and we are getting the 'user' directly because by default, 
+                        user object is already available to any of our html template so we can use it anywhere in the template -->
+                        {% if user.id is not None %}
+                        <div class="widget-header">
+                            <small class="title text-muted">Welcome {{user.first_name}}</small>
+                            <div> 
+                                <!-- # 135a Now we will include the login and registration link in their various hrefs -->
+                                <!-- # 135b Next we will go back to register.html # 136 and make a html code. -->
+                                <!-- <a href="#">Dashboard</a> <span class="dark-transp"> | </span> --> <!-- # 170c We will add the link to user dashboard here when we start using the dashboard template.-->
+                                <a href="{% url 'dashboard' %}">Dashboard</a> <span class="dark-transp"> | </span> <!-- # 183 We can now add the link to our dashboard then goto the views.py # 184 of the accounts app to create our dashboard function-->
+                                <a href="{% url 'logout' %}"> Logout</a> <!-- # 170d We will add the logout link then go to the # 171 views.py file of the account app to add the logout functionality-->
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="widget-header"> <!-- # 135 start -->
+                            <small class="title text-muted">Welcome guest!</small>
+                            <div> 
+                                <!-- # 135a Now we will include the login and registration link in their various hrefs -->
+                                <!-- # 135b Next we will go back to register.html # 136 and make a html code. -->
+                                <a href="{% url 'login' %}">Sign in</a> <span class="dark-transp"> | </span>
+                                <a href="{% url 'register' %}"> Register</a>
+                            </div>
+                        </div> <!-- # 135 ends -->
+                        {% endif %}
+                        <!-- # 97b When we click the cart icon showing the total cart, we should route to the cart page. 
+                        # Next will want to view details of product in the store page(store.html) before adding the product in the cart.
+                        # so all product should be viewed in the product_detail.html page before adding them to cart. To do this, 
+                        # we will change all the buttons in the store.html # 99 to 'View Detail' and then direct the href link to product_detail.html page-->
+                        <a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">
+                            <div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>
+                            <!-- # 97a We will print the cart_count value here -->
+                            <span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
+                        </a>
+                    </div> <!-- widgets-wrap.// -->
+                </div> <!-- col.// -->
+    </div> <!-- row.// -->
+        </div> <!-- container.// -->
+    </section> <!-- header-main .// -->
+    
+    
+    
+    
+    </header> <!-- section-header.// -->

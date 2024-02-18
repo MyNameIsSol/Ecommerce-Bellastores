@@ -1,0 +1,12 @@
+{% autoescape off %} <!-- # 173 We will first put the autoescape tag which is used to render the html cuz it is the safest way of to render html for sending emails. -->
+
+Hi {{user.first_name}},
+
+Please click on below link to confirm your registration.
+http://{{domain}}{% url 'activate' uidb64=uid token=token %} <!-- Here in the activate link, when the user click on it, it will take the user to the activate view(page) and 'set the user isActive= True' and we will be passing the uid and token -->
+<!-- Also note that when this link is clicked once, the token automatically get expired and nobody can use it again even the actual user-->
+
+If you think it's not you, please ignore this email.
+{% endautoescape %}  <!-- # 173 ends -->
+
+<!-- # 174 Next we will configure our SMTP by going to the # 175 settings.py file of the bellastores app folder -->

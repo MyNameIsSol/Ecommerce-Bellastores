@@ -1,0 +1,251 @@
+<!-- # 41 include the base template (base.html) which contains our html header and footer 
+    then add the block content code for the store by copying the main content from our already made template. 
+    When done, refresh the browser to see our store page. we will then make the images to display by loading static-->
+
+<!-- # 42 we will go to the views.py # 43 file of the store app to get all products to be rendered in this template -->
+
+<!-- # 41a We include the base template -->
+{% extends 'base.html' %}
+
+<!-- # 41c We load static files to be displayed in the block content section -->
+{% load static %}
+
+<!-- # 41b We include the block content(main content of the store) -->
+{% block content %}
+
+<!-- ========================= SECTION PAGETOP ========================= -->
+<section class="section-pagetop bg">
+    <div class="container">
+        <!-- # 105a  We want to display a text 'Search Results' When we search for a product on the store page else display a text 'Our Store' -->
+        <!-- # 105b Also we want if the search keyword is not found in the database, we want to show a text in the content area of the store.html # 106 like 'No Result Found. Please Try Again..' -->
+        {% if 'search' in request.path %}
+        <h2 class="title-page">Search Result</h2>
+        {% else %}
+        <h2 class="title-page">Our Store</h2>
+        {% endif %}
+        
+    </div> <!-- container //  -->
+    </section>
+    <!-- ========================= SECTION INTRO END// ========================= -->
+    
+    <!-- ========================= SECTION CONTENT ========================= -->
+    <section class="section-content padding-y">
+    <div class="container">
+    
+    <div class="row">
+        <aside class="col-md-3">
+            
+    <div class="card">
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Categories</h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_1" style="">
+                <div class="card-body">
+                    <ul class="list-menu">
+
+                <!-- #51b This calls this store app and displays its url -->
+                    <li><a href="{% url 'store' %}">All Products </a></li>
+
+            <!-- # 51a We will use the for loop to display all categories using the context_processor.py file 
+                and include the category href link using the get_url method in the models.py file of the catigory app. -->
+            
+                    {% for category in links %}
+                    <li><a href="{{ category.get_url }}">{{ category.category_name }} </a></li>
+                    {% endfor %}
+                    </ul>
+
+            <!-- # 52 Next we will make a single product page so that when we click a product (product_name) in the store webpage we will 
+                go to the product detail page. So the url will have the form '127.0.0.1:800/store/category_slug/product_slug'
+                To do this we will first create the url path in the url.py # 53 file of the store app -->
+                </div> <!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group  .// -->
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Sizes </h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_4" style="">
+                <div class="card-body">
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> XS </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> SM </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> LG </span>
+                  </label>
+    
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light"> XXL </span>
+                  </label>
+            </div><!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group .// -->
+        
+        <article class="filter-group">
+            <header class="card-header">
+                <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
+                    <i class="icon-control fa fa-chevron-down"></i>
+                    <h6 class="title">Price range </h6>
+                </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_3" style="">
+                <div class="card-body">
+                    
+                    <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label>Min</label>
+                      <!-- <input class="form-control" placeholder="$0" type="number"> -->
+                          <select class="mr-2 form-control">
+                            <option value="0">$0</option>
+                            <option value="50">$50</option>
+                            <option value="100">$100</option>
+                            <option value="150">$150</option>
+                            <option value="200">$200</option>
+                            <option value="500">$500</option>
+                            <option value="1000">$1000</option>
+                        </select>
+                    </div>
+                    <div class="form-group text-right col-md-6">
+                      <label>Max</label>
+                          <select class="mr-2 form-control">
+                            <option value="50">$50</option>
+                            <option value="100">$100</option>
+                            <option value="150">$150</option>
+                            <option value="200">$200</option>
+                            <option value="500">$500</option>
+                            <option value="1000">$1000</option>
+                            <option value="2000">$2000+</option>
+                        </select>
+                    </div>
+                    </div> <!-- form-row.// -->
+                    <button class="btn btn-block btn-primary">Apply</button>
+                </div><!-- card-body.// -->
+            </div>
+        </article> <!-- filter-group .// -->
+        
+    </div> <!-- card.// -->
+    
+        </aside> <!-- col.// -->
+        <main class="col-md-9">
+    
+    <header class="border-bottom mb-4 pb-3">
+            <div class="form-inline">
+                <span class="mr-md-auto"><b>{{ product_count }} </b> Items found </span>
+                
+            </div>
+    </header><!-- sect-heading -->
+    
+    <div class="row">
+        <!-- # 106 We want to load the products if its found by search, else we will display a text 'No Result Found'. 
+            Next, We will make it posible to selete variation(color, size) on the product_detail.html # 107 page-->
+        {% if products %}
+
+        <!-- # 44a We wiil loop through the products and display them here -->
+        <!-- # 44b Next we want to display products by selecting its Categories on the web page 
+            so if we have a url like so '127.0.0.1:8000/store/category_slug(shirts)/' it will display only 
+            products in the shirts category-->
+        <!-- #44c To do this we will add a urlpattern in the url.py # 45 file of the store app to match the category(shirt, jeans)-->
+
+        {% for product in products %}
+        <div class="col-md-4">
+            <figure class="card card-product-grid">
+                <div class="img-wrap"> 
+                    
+            <!-- # 41b We load our first static image -->
+            <!-- # 60 We will route each product to the product-detail.html page by including
+                the get_url function to its product image and product name href. Next we will change 
+                the home page banner by storing a banner image in the (project app) static folder(static/images/banner) 
+                and then going to the home.html # 61 file to rename the previous image name to the new image-->
+
+                    <a href="{{ product.get_url }}"><img src="{{ product.images.url }}"></a>
+                    
+                </div> <!-- img-wrap.// -->
+                <figcaption class="info-wrap">
+                    <div class="fix-height">
+                        <a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
+                        <div class="price-wrap mt-2">
+                            <span class="price">$ {{ product.price }}</span>
+                        </div> <!-- price-wrap.// -->
+                    </div>
+
+                <!-- # 91a We will include the add_cart() function path to the href of this Add To Cart button -->
+                <!-- # 91b Next while on the cart page (cart.html # 92), we will want to be able to go back to the product_detail.html 
+                    when we click each item product name close to the product image on the cart page -->
+
+                    <!-- <a href="{% url 'add_cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a> -->
+
+                <!-- # 99a We will change all 'Add to Cart' button in # 91 to 'View details' so that the user can select a size and color before making a purchase -->
+                <!-- # 99b Next we will fix the paginator to display only six products per page in the store.html file. To do this 
+                       we will go to the store() function in the view.py # 100 file of the store app -->
+                    <a href="{{ product.get_url }}" class="btn btn-block btn-primary">View Details </a>
+                </figcaption>
+            </figure>
+        </div> <!-- col.// -->
+        {% endfor %}
+        {% else %}
+        <div>
+            <h2>No result found. Please try again</h2>
+        </div>
+        {% endif %}
+    
+    </div> <!-- row end.// -->
+    
+    <!-- # 101a We will make our paginator work with the next and previous, page number button -->
+    <nav class="mt-4" aria-label="Page navigation sample">
+    <!-- # 101b first we want to show the paginator only if the products(context value) has other products, else there is no need -->
+    {% if products.has_other_pages %}
+      <ul class="pagination">
+        <!-- # 101c Next we want to make the previous button enabled only if there is a previous page to display -->
+        {% if products.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{products.previous_page_number}}">Previous</a></li>
+        {% else %}
+        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+        {% endif %}
+
+        <!-- # 101d Next we will make the number page button to work by looping through the total paginator from our view file -->
+        {% for i in products.paginator.page_range %}
+            {% if products.number == i %}
+                <li class="page-item active"><a class="page-link" href="#">{{i}}</a></li> <!-- this will print the first page number -->
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li> <!-- this will print the remaining page number dynamically -->
+            {% endif %}
+        {% endfor %}
+
+        <!-- # 101e Next we want to make the next button enabled only if there is a next page to display -->
+        <!-- # 101f Next we will want the search functionaly on the navbar of the store page to work. We will want 
+            the url to have the form on the browser 127.0.0.1:8000/stroe/search/?keyword=searchkeyword. To do this, 
+            we will go to the urls.py # 102 file of the store app to add our url search pattern -->
+        {% if products.has_next %}
+            <li class="page-item"><a class="page-link" href="?pages={{products.next_page_number}}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+    </nav>
+    
+        </main> <!-- col.// -->
+    
+    </div>
+    
+    </div> <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}
+<!-- # End of block content code -->
