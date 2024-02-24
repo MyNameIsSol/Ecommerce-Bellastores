@@ -145,15 +145,48 @@ def forgotPassword(request):
             to_email = email # address to send the email ( a user email)
             send_email = EmailMessage(mail_subject, message, to=[to_email]) # this email function take the parameter for sending an email. NB: import # 200fv EmailMessage at the top
             send_email.send() # This will send the email for us (# 200f ends). We can now create the reset_password_email.html # 201 file in the template/accounts folder and pass the message parameters to it(user,domain,uid,token)
-            messages.success(request, 'Password reset email has been sent ro your email address.') # 200g This will show a success message if all goes well
+            messages.success(request, 'Password reset email has been sent to your email address.') # 200g This will show a success message if all goes well
             return redirect('login') # 200h then we redirect to login.
         else:
             messages.error(request, 'Account does not exist!') # 200i this message will appear in the forgotPassword page if something goes wrong. We should also include the alert message in the forgotPassword.html file # 200j
-            return redirect('forgotPassword') # 200k then we redirect to login.
+            return redirect('forgotPassword') # 200k then we redirect to forgotpassword page. We can now include the forgotpassword link in login.html # 200l file in the templates/accounts
         
     # 191b next we will create the forgotPassword.html file # 192 in the teplates/accounts by copying the login.html and doing some edit
     return render(request, 'accounts/forgotPassword.html') 
 
 # 204 Here we will create the resetpassword_validate function for taking us to the reset password page if all validation is passed. So when we click on the reset link, this function executes
-def resetpassword_validate(request):
-    return HttpResponse('OK')
+def resetpassword_validate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode() # 204a this will decode the uidb64 and store the primary key of the user into the variable
+        user = Account._default_manager.get(pk=uid) # 204b this will return the user object, storing it in the variable.
+    except(TypeError, ValueError, OverflowError, Account.DoesNotExist): # 204c Here we will handle some error like type error, value error, overflow error, accoun not exist, if any of this error, we set the user to none
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token): # 204d Here if the token is valid, then we continue. the purpose of checking token is to whether it is a secured request or not
+        request.session['uid'] = uid # 204e Next we will save the uid inside a session because we need to access the uid when resetting the password
+        messages.success(request, 'Please reset your passowrd') # 204f We will create a message to display in the resetPassword.html page
+        return redirect('resetPassword') # 204g This will redirect us to the resetPassword url, but first we need to go to the urls.py # 205 of the accounta app to inlude the url of the resetPassword
+    else:
+        messages.error(request, 'This link has expired!') # 204h A message to show if the token is invalid and user is None
+        return redirect('login') # 204h We will redirect to login.html
+    
+# 207 Here we will crate the function for the resetPassword url we just created.
+def resetPassword(request):
+    if request.method == 'POST': # 212 We check if a POST was made
+        password = request.POST['password'] # 213a we receive the password that was posted.
+        confirm_password = request.POST['confirm_password'] # 213b we receive the confirm_password that was posted.
+
+        if password == confirm_password: # 213c we check if the paswword equals confirm_password
+            uid = request.session.get('uid')# 213d Next We will take the uid(user id) value we stored inside the session in # 204e
+            user = Account.objects.get(pk=uid) # 213e We will now get the user using the uid we saved in session
+            user.set_password(password) # 213f We will now use the set_password to save the password in our database. NB: If we use (save) to store the password we will get an error and it will not save. django use set_password to Hash the password before saving
+            user.save() # 213g Here we save the user
+            messages.success(request, 'Password reset successful') # 213h Here we create our success message
+            return redirect('login') # 213i The we redirect to login page
+        else: # 214a else
+            messages.error(request, 'Password does not match') # 214b We display an error message if password is not same
+            return redirect('resetPassword') # 214c We redirect to resetPassword.html page with the message
+    else: # 212b if method is not a POST
+        return render(request, 'accounts/resetPassword.html') # 212c This will take us back to the reset password template.
+                                                              # 214 Next we will
+    # return render(request, 'accounts/resetPassword.html') # 207b We will duplicate the login.html file and use it to create our resetPassword.html file # 208 by editing it. or we copy a fresh login.html and edit

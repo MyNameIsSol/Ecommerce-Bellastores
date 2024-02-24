@@ -22,4 +22,8 @@ urlpatterns = [
     # 203 Here we will create our resetpassword_validate url then goto the views.py # 204 file of the account app to create the function.
     path('resetpassword_validate/<uidb64>/<token>/', views.resetpassword_validate, name='resetpassword_validate'),
 
+    # 205 Here we will create our resetpassword url for the resetPassword.html page
+    path('resetPassword/', views.resetPassword, name='resetPassword'), # 206 Next we will go to the views.py file # 207 of the accounts app to make the views for the resetPassword url
+
+
 ]
