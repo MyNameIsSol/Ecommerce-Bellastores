@@ -1,5 +1,6 @@
 from django.db import models
 from store.models import Product, Variation
+from accounts.models import Account # 236b we import the Account model
 
 # Create your models here.
 # 70a We will create  our cart class(model) and cartitem class(model)
@@ -16,6 +17,8 @@ class Cart(models.Model):
         return self.cart_id
 
 class CartItem(models.Model):
+    # 236 Here we will create a user field to help us assign a user to the cartitem when the user is login so we won't lose the items in the cart
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True) # 236b We will import the Account model at the top.  
     # 70a(ii) import the product class at the top
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     # 114 We will create a variation(import the Varaition class at the top) field to sore our product variations. And we will use ManyToManyField cuz many products can have same variations
@@ -25,7 +28,7 @@ class CartItem(models.Model):
     # 114c Next we will go to the add_cart() function of the view.py # 115 file of the cart app to add our variations into the cart item
     variations = models.ManyToManyField(Variation, blank=True)
     # end # 114
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True) # 237 Here we add the 'null = True' argument then we run migrations "python manage.py makemigrations", "python manage.py migrate". Next we will go to the login() function of the views.py # 238 file in the accounts app
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 

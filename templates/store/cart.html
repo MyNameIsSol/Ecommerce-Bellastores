@@ -148,7 +148,9 @@
                     <p class="text-center mb-3">
                         <img src="{% static './images/misc/payments.png' %}" height="26">
                     </p>
-                    <a href="./place-order.html" class="btn btn-primary btn-block"> Checkout </a>
+                    <!-- # 217c We will add the checkout page url here so we can route to the page then we will go to the checkout.html page # 218 to finish adding the template format -->
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Checkout </a>
+                    <!-- # 230 We will want that the user will login before he can checkout. So we will go to the views.py # 231 file of the carts app to add the login_required decorator to the checkout() fuction -->
 
                 <!-- # 93a We will route the 'Continue Shopping' button to the store page -->
                 <!-- # 93b Next while we are in the product detail page, we will want to know if this product is added to cart or not. 

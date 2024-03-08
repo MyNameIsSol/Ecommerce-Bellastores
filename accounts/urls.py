@@ -25,5 +25,4 @@ urlpatterns = [
     # 205 Here we will create our resetpassword url for the resetPassword.html page
     path('resetPassword/', views.resetPassword, name='resetPassword'), # 206 Next we will go to the views.py file # 207 of the accounts app to make the views for the resetPassword url
 
-
 ]

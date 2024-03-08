@@ -1,0 +1,149 @@
+<!-- # 217 Here we will create our check-out template. We can copy the cart.html code and then edit. -->
+<!-- # 217b Next we will go add the checkout url to the cart.html # 217c so we can route to the checkout page -->
+<!-- # 218 We will extend the base template to include the header.html and the footer.html -->
+{% extends 'base.html' %}
+
+<!-- # 219 We will load static to display the static files(images) -->
+    {% load static %}
+
+    {% block content %}
+    <section class="section-content padding-y bg">
+        <div class="container">
+        
+        <!-- ============================ COMPONENT 1 ================================= -->
+        <div class="row">
+            <aside class="col-lg-6">
+        <div class="card p-4" >
+            <!-- 221 We will create a form for our billing address -->
+            <h4>Biling Address</h4>
+             <form action="" method="POST"><!-- # 232 We will add the method and action -->
+                 {% csrf_token %} <!-- # 233 We will add the csrf_token to secure the form -->
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="">First Name</label>
+                        <input type="text" name="first_name" class="form-control" required id="">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" required id="">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="">Email</label>
+                        <input type="email" name="email" class="form-control" required id="">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Phone Number</label>
+                        <input type="text" name="phone" class="form-control" required id="">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="">Address Line 1</label>
+                        <input type="text" name="address_line_1" class="form-control" required id="">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Address Line 2</label>
+                        <input type="text" name="address_line_2" class="form-control" id="">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col form-group">
+                        <label for="">City</label>
+                        <input type="text" name="city" class="form-control" required id="">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">State</label>
+                        <input type="text" name="state" class="form-control" required id="">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Country</label>
+                        <input type="text" name="country" class="form-control" required id="">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="">Order Note</label>
+                    <textarea name="order_note" class="form-control id="" rows="2" required></textarea>
+                </div>
+                
+            <!-- </form> --> <!-- # 222 The form for the billing address will end here --> 
+                             <!-- # 234 We will comment the endind form tag and push it down to close after the "place order" button -->
+        </div> <!-- card.// -->
+        
+            </aside> <!-- col.// -->
+            <aside class="col-lg-6">
+            <!-- # 223 Here we display all he will be purchasing in a table just like the cart items page. To do this, we will go to the views.py # 224 file of the carts app to add the functionality. -->
+                <div class="card">
+                <div class="card-body">
+
+                    <table class="table table-borderless table-shopping-cart">
+                        <thead class="text-muted">
+                        <tr class="small text-uppercase">
+                          <th scope="col">Product</th>
+                          <th scope="col"  width="120">Quantity</th>
+                          <th scope="col" width="120">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                
+                        <!-- # 228a we will loop through out cart_items and display them -->
+                        {% for cart_item in cart_items %}
+                        <tr>
+                            <td>
+                                <figure class="itemside align-items-center">
+                
+                                    <!-- # 228b We will load the static images -->
+                                    <div class="aside"><img src="{{ cart_item.product.images.url }}" class="img-sm"></div>
+                                    <figcaption class="info">
+                
+                                 <!-- # 228c We will include the product-detail function path to be able to route back to the product detail page -->
+                                        <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                                    
+                                <!-- # 228d We will check if our cart product have a variation (color and size) then we will display it here. -->
+                                        {% if cart_item.variations.all %}
+                                          {% for item in cart_item.variations.all %}
+                                        <p class="text-muted small">{{item.variation_category | capfirst}} : {{item.variation_value | capfirst}}<br></p>
+                                          {% endfor %}
+                                        {% endif %}
+                                    </figcaption>
+                                </figure>
+                            </td>
+                            <td> 
+                                <label for="">{{ cart_item.quantity }}</label>
+                            </td>
+                            <td> 
+                                <div class="price-wrap"> 
+                                    <!-- 79b We will create a function called sub_total in the CartItem class of the models.py # 80 file of the carts app to calculate the sub total(price and quantity) of each item -->
+                                    <!-- # 229 This area will use the 79b. Next we will go make the checkout button in the cart.html # 230 file force the user to login before he can checkout.                                     -->
+                                    <var class="price">$ {{ cart_item.sub_total }}</var> 
+                                    <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
+                                </div> <!-- price-wrap .// -->
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                        
+                        </tbody>
+                        </table>
+                    
+                    <!-- <a href="./place-order.html" class="btn btn-primary btn-block"> Place Order </a> -->
+                    <button type="submit" name="submit" class="btn btn-primary btn-block"> Place Order </button>
+                    </form><!-- # 235 We will close the form tag here then change the place order link to button and comment the anchor tag. 
+                            Next we will want the cart id containing the cart items to be transfered/reflect to the user when the user login instead of the cart items being cleared off/removed from session. To do this, we will create a user field in the CartItem table/models of the database by going to the models.py # 236 file of the carts app -->
+
+                <!-- # 220 We will route the 'Continue Shopping' button to the store page -->
+                    <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+        
+        </aside> <!-- col.// -->
+        
+        
+        </div> <!-- row.// -->
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+        
+        </div> <!-- container .//  -->
+        </section>
+        <!-- ========================= SECTION CONTENT END// ========================= -->
+    {% endblock %}

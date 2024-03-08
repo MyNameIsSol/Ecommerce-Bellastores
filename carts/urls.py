@@ -19,4 +19,7 @@ urlpatterns = [
     # 88 We will add the url path to the remove_cart_item() method in the views.py file, then we will go to the cart.html # 89 file to include the remove_cart_item function in the remove button
     # 126 We will now add a new path parameter( <int:cart_item_id> ) to the remove_cart_item path. Next we will go to the views.py # 127 file of the carts app to modify the remove_cart_item() function.
     path('remove_cart_item/<int:product_id>/<int:cart_item_id>/', views.remove_cart_item, name = 'remove_cart_item'),
+
+    # 215 Here we will create the url path to our checkout 
+    path('checkout/', views.checkout, name='checkout'), # 215b Next we will go to the views.py # 216 file of the carts app to create the checkout function
 ]

@@ -13,6 +13,9 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage # 172 & #200f imports end
 
+from carts.views import _cart_id  # 240a this will import the cart id into this file for us.
+from carts.models import Cart, CartItem # 240b this will import the Cart class and the CartItem class
+import requests # 160b
 
 # Create your views here.
 
@@ -74,12 +77,72 @@ def login(request):
         email = request.POST['email']
         password = request.POST['password']
 
+        #NB: This is the user we use in 243b
         user = auth.authenticate(email=email, password=password) # 168b we will import 'auth' at the top from django.contrib
         if user is not None:
+            # 238 We want that when we click the login button, after it checks the neccessary cridentials, email and pass. It should also check if the user has anything in the cart, and if there is an item there, it will assign the user to the cart item. 
+            try:
+                cart = Cart.objects.get(cart_id=_cart_id(request)) # 239 We will use the cart id gotten from the web browser to check if the id exist in the cart table 
+                                                                    # NB: the function to get the cart id from the web browser is already written in the views.py # 73eii file of the cart app, 
+                                                                    # we will just import the function '_cart_id()' # 240a at the top. We will also import the 'Cart and CartItem' model # 240b at the top to be able to use them here.
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists() # 241 Next we use the cartid to check if the items exist in the cartitem table
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart) # 242 Next we will get all the items assigned to the cartid from the browser
+
+                    # 253 Here we will write the code to handle grouping the cart item when the user is logged in
+                    # Here in 253 we get all the variation associated to the item by cart id from the newly selected item
+                    product_variation = [] # 253b We will create an empty variation list
+                    for item in cart_item: # 253c We will loop through the cart item in # 242 to get each item in the cart
+                        variation = item.variations.all() # 253d We will get all the variation associated to this item the user have selected 
+                        product_variation.append(list(variation)) # 253e Next we will append the variation into an array and make it a list because by defalt, it is a query set.
+
+                    cart_item = CartItem.objects.filter(user=user) # 254 Here we will get the cart items of this user so we can get his product variations
+                    ex_var_list = [] # 254b we create an empty array to store existing variation gotten for the items in the user cart
+                    id = [] # 254c
+                    for item in cart_item: # 254d We will loop through the cart item the user already have
+                        existing_variation = item.variations.all() # 254e We are getting all the variation associated to each item the user have selected previously
+                        ex_var_list.append(list(existing_variation)) # 254f We are appending the variation as a list in the ex_var_list array
+                        id.append(item.id) # 254g We are appending the item id to the empty id array we crated earlier.
+
+                    for pr in product_variation: # 255 We will check the the newly selected cart item with variation is already in the user ex_var_list
+                        if pr in ex_var_list: # 255b if the newly selected product variation is in the ex_var_list(The one stored for the user before)
+                            index = ex_var_list.index(pr) # 255c We will get the position where the new product variation is found in the ex_var_list
+                            item_id = id[index] # 255d this will give use the id of the item
+                            item = CartItem.objects.get(id=item_id) # 255e This will use the item id to get the item.
+                            item.quantity += 1 # 255f If the item with same variation exist, we increase the item quantity
+                            item.user = user # 255g We assign the user to the cart item
+                            item.save() # 255h We save the item.
+                        else: # 256
+                            cart_item = CartItem.objects.filter(cart=cart) #256b if the if statement fails, we will save the cart item. meaning that the user does not have the item in his cart before.
+                            for item in cart_item: # 256c This part, we will comment # 243a to # 243c and use it here
+                                item.user = user # 256d
+                                item.save() 
+                                # 257 Next we will want to fix the decrement cart item when the user is logged in. To do this we will go to the remove_cart() function in the views.py # 258 file of the carts app
+                        
+                    # for item in cart_item: # 243a This assigns the user to each cart item
+                        # item.user = user # 243b
+                        # item.save() # 243c Now after we have assign the cart item the user, the cart page still shows empty and the cart page count appears as zero. 
+                                    # we will first correct the cart page count by going to the counter() function in the content_processor.py # 244 file of the carts app
+            except:
+                pass
+
             auth.login(request, user)
             # return redirect('home')
             messages.success(request, 'You are now logged in.') # 187b after we add the message success we can now go to the dashboard.html # 188 in templates/accounts
-            return redirect('dashboard') # 187 We will comment redircting to home above and instead, redirect to dashboard when we login adding the message function
+            #160b return redirect('dashboard') # 187 We will comment redircting to home above and instead, redirect to dashboard when we login adding the message function
+                                        # 160 We will use the request library to direct the user to the required page by installing it with the command. "pip install requests" then we will import "request" at the top. If program did not install, try uninstalling your antivirus(i.e Smadav)
+            url = request.META.get('HTTP_REFERER') # 160c Next we will comment the # 160b redirect code and write the new code for redirecting the user. But wee will first get the url from the browser and assign it to a variable(url),
+            try: # 160d
+                # next=/cart/checkout/
+                query = requests.utils.urlparse(url).query # 160e Here we will get the next parameter and its value, assign it to a variable(query)
+                # 'next' : '/cart/checkout/'
+                params = dict(x.split('=') for x in query.split('&')) # 160f Here we will seperate(split using = sign) the query variable value as key : value and store it in params as dictionary(array)
+                if 'next' in params: # 160g Next we will direct the user to /cart/checkout/
+                    nextPage = params['next'] # 160gi
+                    return redirect(nextPage) # 160gii
+            except: # 160di
+                return redirect('dashboard')  # 160h If the try block fail, we can direct the user to the dashboard. Next we need to see the cart items in the checkout page, So we will fix that by going to the checkout() function in the views.py # 161 file of the cart app
+
         else:
             messages.error(request, 'Invalid login credentials.')
             return redirect('login') # 168 ends then we go to # 169 login.html to include the alert message for error
@@ -188,5 +251,5 @@ def resetPassword(request):
             return redirect('resetPassword') # 214c We redirect to resetPassword.html page with the message
     else: # 212b if method is not a POST
         return render(request, 'accounts/resetPassword.html') # 212c This will take us back to the reset password template.
-                                                              # 214 Next we will
+                                                              # 214 Next we will need to make our check-out functioality by going to the urls.py # 215 file of the carts app to add the url
     # return render(request, 'accounts/resetPassword.html') # 207b We will duplicate the login.html file and use it to create our resetPassword.html file # 208 by editing it. or we copy a fresh login.html and edit
