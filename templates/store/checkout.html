@@ -16,7 +16,9 @@
         <div class="card p-4" >
             <!-- 221 We will create a form for our billing address -->
             <h4>Biling Address</h4>
-             <form action="" method="POST"><!-- # 232 We will add the method and action -->
+            <!-- # 295 Here we will add the post url "{% url 'place_order' %}" of our billing form then we can test the form -->
+            <!-- # 296 Next we will want the user to be directed to the payment page and not the checkout page after collecting the billing address. To do this, we will go to the urls.py file # 297 of order app to add the url_pattern for the payment page-->
+             <form action="{% url 'place_order' %}" method="POST"><!-- # 232 We will add the method and action -->
                  {% csrf_token %} <!-- # 233 We will add the csrf_token to secure the form -->
                 <div class="form-row">
                     <div class="col form-group">

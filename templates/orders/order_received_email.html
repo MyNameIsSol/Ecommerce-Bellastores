@@ -1,0 +1,11 @@
+{% autoescape off %} <!-- # 332 We will first put the autoescape tag which is used to render the html cuz it is the safest way of to render html for sending emails. -->
+
+Hi {{user.first_name}},
+
+YOUR ORDER HAS BEEN RECEIVED
+
+Order Number : {{order.order_number}} <!-- # We will access the order number like so. same way we can include the product list in the view and then add it to the email. -->
+
+{% endautoescape %}  <!-- # 332 ends -->
+
+<!-- # 333 Next we will we go back to the view.py file # 334 of the orders app to see how we can redirect the user to the order_complete page -->

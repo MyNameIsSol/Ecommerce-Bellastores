@@ -1,0 +1,232 @@
+<!-- # 299a Here we will add our bootstrap template for the payments.html page -->
+
+<!-- # 299b We will extend the base template to include the header.html and the footer.html -->
+{% extends 'base.html' %}
+
+<!-- # 299d We will load static to display the static files(images) -->
+    {% load static %}
+
+    {% block content %}
+    <!-- # 299C WE will add the html code to display the content here and modify it as we want -->
+    <!-- # 300 We will go to the views.py file # 301 to write the code that will bring the order content to this html page dynamically -->
+    <section class="section-content padding-y bg">
+        <div class="container">
+        
+        <!-- ============================ COMPONENT 1 ================================= -->
+    <h4 class="text-center mb-10">Review Your Order and Make Payment</h4>
+        <div class="row">
+            <aside class="col-lg-8">
+                <div class="card">
+                    <h5 class="card-header">Billing Address</h5>
+                    <div class="card-body"> 
+                        <!-- # 303 We will display the order details  -->
+                        <!-- # 304 To display the full_name and full_address of the user, we will go to the models.py # 305 of the orders app and write a function that concatinate the first_name and last_name and the addresses-->
+                        <p class="card-text mb-0">{{order.full_name}}</p> <!-- # 306 We can now display the user full_name -->
+                        <p class="card-text mb-0">{{order.full_address}}</p> <!-- # 306b We can now display the user full_address -->
+
+                        <!-- # 307 We will display other details -->
+                        <p class="card-text mb-0">{{order.city}}, {{order.state}}</p> <!-- # 307b We will display the city and state here-->
+                        <p class="card-text mb-0">{{order.country}}</p> <!-- # 307c We will display the country here-->
+                        <p class="card-text mb-0">{{order.email}}</p> <!-- # 307d We will display the email here-->
+                        <p class="card-text mb-0">{{order.phone}}</p> <!-- # 307e We will display the phone here-->
+
+                        <!-- # 308 We will check if the other note was inputted before we display it -->
+                        {% if order.order_note %}
+                            <b>Order Note: </b> {{order.order_note}}
+                        {% endif %} <!-- # 308 ends -->
+
+
+                    </div>
+                    </div> <!-- card.// -->
+                <div class="card">
+                    <h5 class="card-header">Payment Method</h5>
+                    <div class="card-body"> 
+                        <!-- # 309 For the payment method we will use a static one (paypal). Though we can provide a dropdown to select payment method for future projects -->
+                        <p class="card-text">Paypal</p>
+                    </div>
+                    </div> <!-- card.// -->
+                <div class="card">
+                    <h5 class="card-header">Review Products</h5>
+                    <div class="card-body"> 
+                        <!-- # 310 Here we will display all the orderd Products in tabular form-->
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                            <tr class="small text-uppercase">
+                              <th scope="col">Product</th>
+                              <th scope="col"  width="120">Quantity</th>
+                              <th scope="col" width="120">Price</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                    
+                            <!-- # 310a we will loop through out cart_items and display them -->
+                            {% for cart_item in cart_items %}
+                            <tr>
+                                <td>
+                                    <figure class="itemside align-items-center">
+                    
+                                        <!-- # 310b We will load the static images -->
+                                        <div class="aside"><img src="{{ cart_item.product.images.url }}" class="img-sm"></div>
+                                        <figcaption class="info">
+                    
+                                     <!-- # 310c We will include the product-detail function path to be able to route back to the product detail page -->
+                                            <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                                        
+                                    <!-- # 310d We will check if our cart product have a variation (color and size) then we will display it here. -->
+                                            {% if cart_item.variations.all %}
+                                              {% for item in cart_item.variations.all %}
+                                            <p class="text-muted small">{{item.variation_category | capfirst}} : {{item.variation_value | capfirst}}<br></p>
+                                              {% endfor %}
+                                            {% endif %}
+                                        </figcaption>
+                                    </figure>
+                                </td>
+                                <td> 
+                                    <label for="">{{ cart_item.quantity }}</label>
+                                </td>
+                                <td> 
+                                    <div class="price-wrap"> 
+                                        <!-- 79b We will create a function called sub_total in the CartItem class of the models.py # 80 file of the carts app to calculate the sub total(price and quantity) of each item -->
+                                        <!-- # 310e This area will use the 79b. -->
+                                        <var class="price">$ {{ cart_item.sub_total }}</var> 
+                                        <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
+                                    </div> <!-- price-wrap .// -->
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                            
+                            </tbody>
+                            </table>
+                    </div>
+                    </div> <!-- card.// -->
+            </aside> <!-- col.// -->
+
+            <aside class="col-lg-4">
+        
+                <div class="card">
+                <div class="card-body">
+                    <dl class="dlist-align">
+
+                <!-- # 311 Next we will display total price coming from the view.py file of the order app. -->
+                      <dt>Total price:</dt>
+                      <dd class="text-right">$ {{ total }}</dd>
+                    </dl>
+                    <dl class="dlist-align">
+
+                    <!-- # 312 We will display the tax calculated from the views.py file  -->
+                      <dt>Tax:</dt>
+                      <dd class="text-right"> $ {{ tax }} </dd>
+                    </dl>
+                    <dl class="dlist-align">
+                    
+                    <!-- # 313 We will display the grand_total calculated from views.py file -->
+                      <dt>Total:</dt>
+                      <dd class="text-right text-dark b"><strong>$ {{ grand_total }}</strong></dd>
+                    </dl>
+                    <hr>
+                    <p class="text-center mb-3">
+                        <img src="{% static './images/misc/payments.png' %}" height="26">
+                    </p>
+                    <!-- # 314 Next for our payment button, we will be using flutterwave payment integration. So we will comment our previous button and add the flutter wave button gotten from their website -->
+                    <!-- # 314b Next we will go to templates/base.html file # 315 to add our flutterwave script -->
+                    <!-- <a href="#" class="btn btn-primary btn-block"> Make Payment </a> -->
+                    <button type="button" id="start-payment-button" onclick="makePayment()">Pay Now</button> <!-- Flutterwave button -->
+
+                </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+        
+        </aside> <!-- col.// -->
+        
+        
+        </div> <!-- row.// -->
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
+       
+        </div> <!-- container .//  -->
+        </section>
+        <!-- ========================= SECTION CONTENT END// ========================= -->
+
+        <!-- # 316 We will copy the payment script from flutter wave and modify it  -->
+        <script>
+
+            //# code to get our csrf token manually in # 316f
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken'); //# 316f end
+
+            // # 316b We will declear important variables
+            var url = "{% url 'payments' %}" //We wrap all the django tags in a string do it can work in javascript
+            var amount = "{{grand_total}}"
+            var orderID = "{{order.order_number}}"
+            var payment_method = "Fluterwave"
+            var email = "{{order.email}}"
+            var phone = "{{order.phone}}"
+            var ip = "{{order.ip}}"
+            var name = "{{order.full_name}}"
+            var order_note = ""
+            var redirect_url = "{% url 'order_complete' %}" // # 340d(i)
+            if("{{order.order_note}}" != ""){
+                order_note = "{{order.order_note}}"
+            }
+            // # 316b ends
+        
+        // # This makePayment() function is gotten from flutterwave as an inline js script for payment
+        function makePayment() {
+            FlutterwaveCheckout({
+            public_key: "FLWPUBK_TEST-3268dadb3f2d27d535338bf1753d77cc-X", // # 316c We will get our public key from flutterwave
+            tx_ref: "orders-"+orderID, // # 316d We will create a transaction ref
+            amount: amount, 
+            currency: "NGN",
+            payment_options: "card, banktransfer, ussd",
+            meta: {
+                // source: "docs-inline-test",
+                // consumer_mac: "92a3-912ba-1192a",
+                consumer_ip: ip,
+            },
+            customer: {
+                email: email,
+                phone_number: phone,
+                name: name,
+            },
+            customizations: {
+                title: "Bellastore Shopping",
+                description: order_note,
+                logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+            },
+            callback: function (data){
+                //console.log("payment callback:", data); //# 316d This will print a js object data, then we will send to our payment() function in the views.py file to store in our database
+                sendData(); //#316ei We will call the sendData() function here so it will run
+                function sendData(){ //# 316e This function will send the data to our views.py
+                    fetch(url,{method:"POST", headers:{"Content-type":"application/json", "X-CSRFToken":csrftoken,}, body:JSON.stringify({orderID:orderID, transID:data.transaction_id,payment_method:payment_method,status:data.status,}),}) //# 316f We will use javascript fetch function to handle the request response. We will also create a csrf token manually to allow use post the data- Read django doc to get the latest method of getting csrf token as this method is for django 3.1
+                    // .then(response => response.json())
+                    // .then(data => console.log(data));
+                    .then(response => response.json()) // # 340 We will uncomment the response, data of the .then() function above to receive the jsonresponse sent from the payment function in the views.py file of the orders app.
+                    .then(data => {
+                        // console.log('Success: ', data);
+                        // console.log('Transaction Completed.'); # 340c We will comment the console.log() functions since we can now see our data, then redirect the user to our thank you page
+                        window.location.href = redirect_url+'?order_number='+data.order_number+'&payment_id='+data.transID; // # 340d We will redirect the user to the url variable(redirect_url) # 340d(i) created above and then concatenate the neccessary parameters to it.
+                                                                                                                                // # 340e Next we will go to the order_complete() function in the views.py file # 341 of the orders app to make use of the get parameters we are sending to the page
+                    }); // # 340b We will use the data paramenter here to get all the data passed from the payments function order_nuber and transID
+                }
+            },
+            onclose: function() {
+                console.log("Payment cancelled!");
+            }
+            });
+        }
+        //   # 316g After modifying our script, we will go to our views.py file # 317 to modify our payments() function to receive the posted data with the js fetch() function
+        </script>
+    {% endblock %}

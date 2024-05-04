@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'catigory',
     'store',
     'carts',
+    'orders' # 264 Here we will add the order app to the list of installed apps, then we will goto the models.py # 265 file of the orders app to create our models.
 ]
 
 MIDDLEWARE = [

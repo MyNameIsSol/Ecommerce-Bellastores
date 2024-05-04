@@ -1,0 +1,126 @@
+<!-- # 337 Here we will write the html code for the order complete  -->
+{% extends 'base.html' %} <!-- # 337a will bring in the header and footer -->
+{% load static %} <!-- # 337c We will load static so our images can be displayed -->
+{% block content %} <!-- # 337b(i) We can now write our html content in the block content. We will copy the content from the downloaded template(order_complete.html) and paste here -->
+
+<div class="container" style="margin-top: 50px;">
+    <center><i class="fas fa-check-circle" style="font-size: 72px;margin-bottom: 20px;color: #28A745;"></i></center>
+    <h2 class="text-center">Payment Successful</h2>
+	<br>
+	<div class="text-center">
+		<a href="{% url 'store' %}" class="btn btn-success">Shop more</a>
+	</div>
+</div>
+
+<div class="container" style="margin: 0 auto;width: 50%;padding: 50px;background: #f1f1f1;margin-top: 50px;margin-bottom: 50px;">
+    <div class="row invoice row-printable">
+        <div class="col-md-12">
+            <!-- col-lg-12 start here -->
+            <div class="panel panel-default plain" id="dash_0">
+                <!-- Start .panel -->
+                <div class="panel-body p30">
+                    <div class="row">
+                        <!-- Start .row -->
+                        <div class="col-lg-6">
+                            <!-- col-lg-6 start here -->
+
+                            <!-- # 337d We will use static to display the logo -->
+                            <!-- <div class="invoice-logo"><img src="/images/logo.png" alt="Invoice logo" style="max-height: 40px;"></div> -->
+                            <div class="invoice-logo"><img src=" {% static '/images/logo.png' %}" alt="Invoice logo" style="max-height: 40px;"></div>
+                            <!-- # 337e Next we will go to the views.py file # 338 of the orders app in the payments function to send a response back to the payment.html file after payment is sucessuful and email is sent.  -->
+
+                        </div>
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-6">
+                            <!-- col-lg-6 start here -->
+                            <div class="invoice-from">
+                                <ul class="list-unstyled text-right">
+                                    <li><strong>Invoiced To</strong></li> <!-- # 344 We will display the billing address here -->
+                                    <li>{{order.full_name}}</li> <!-- # 344a(i) We will display the user fullname here -->
+                                    <li>{{order.full_address}}</li> <!-- # 344a(ii) We will display the user full address here -->
+                                    <li>{{order.city}}, {{order.state}}</li> <!-- # 344a(i) We will display the user city and state here -->
+                                    <li>{{order.country}}</li> <!-- # 344a(i) We will display the user country here -->
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-12">
+                            <!-- col-lg-12 start here -->
+                            <div class="invoice-details mt25">
+                                <div class="well">
+                                    <ul class="list-unstyled mb0">
+                                        
+                                        <li><strong>Order</strong> #{{ order_number }}</li> <!-- # 343a(i) We will start by displaying the order number-->
+                                        <li><strong>Transaction ID</strong> #{{ transID }}</li> <!-- # 343a(ii) We will display the transID here -->
+                                        <li><strong>Order Date:</strong> {{ order.created_at }}</li> <!-- # 343a(iii) We will display the ordered date here -->
+                                        <li><strong>Status:</strong> {{ payment.status }}</li> <!-- # 343a(iii) We will display the ordered date here -->
+                                    </ul>
+                                </div>
+                            </div>
+                           
+                            <div class="invoice-items">
+                                <div class="table-responsive" style="overflow: hidden; outline: none;" tabindex="0">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="per70 text-center">Products</th>
+                                                <th class="per5 text-center">Qty</th>
+                                                <th class="per25 text-center">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                          <!--  # 345 We will display the products here by looping through the orderproduct table -->
+                                          {% for item in ordered_products %}
+                                            <tr>
+                                                <td>{{item.product.product_name}}
+                                                    <p class="text-muted small">
+                                                        {% if item.variations.all %}
+                                                            {% for i in item.variations.all %}
+                                                                {{i.variation_category | capfirst}} : {{i.variation_value | capfirst}}<br>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </p>
+                                                </td>
+                                                <td class="text-center">{{item.quantity}}</td>
+                                                <td class="text-center">${{item.product_price}} USD</td>
+                                            </tr>
+                                          {% endfor %}
+                                          <!-- # 345 ends -->
+                                            
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <!-- # 346 We will go to the views.py file # 347 to compute the subtotal. -->
+                                                <th colspan="2" class="text-right">Sub Total:</th>
+                                                <th class="text-center">${{subtotal}} USD</th> <!-- # 349a We will display the computed subtotal here -->
+                                            </tr>
+                                            <tr>
+                                                <th colspan="2" class="text-right">Tax:</th>
+                                                <th class="text-center">${{order.tax}} USD</th> <!-- # 349b We will display the tax here from the order table -->
+                                            </tr>
+                                            
+                                            <tr>
+                                                <th colspan="2" class="text-right">Grand Total:</th>
+                                                <th class="text-center">${{order.order_total}} USD</th> <!-- # 349c We will display the grand total here from the order table -->
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="invoice-footer mt25">
+                                <p class="text-center">Thank you for shopping with us!</p>
+                            </div>
+                        </div>
+                        <!-- col-lg-12 end here -->
+                    </div>
+                    <!-- End .row -->
+                </div>
+            </div>
+            <!-- End .panel -->
+        </div>
+        <!-- col-lg-12 end here -->
+    </div>
+    </div>
+
+
+{% endblock %} <!-- # 337b(ii) end-->

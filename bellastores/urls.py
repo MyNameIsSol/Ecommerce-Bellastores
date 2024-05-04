@@ -41,6 +41,9 @@ urlpatterns = [
 # 130 Here we will include the path to the account app and then go to the views.py # 131 file of the account app to create the various view functions.
     path('accounts/', include('accounts.urls')),
 
+# 271 Here we will create our url pattern for the placeOrder button in the checkout template. 
+    path('orders/', include('orders.urls')), # 272 Next we will create a urls.py # 273 file in the orders app 
+
 # 30b import (static) and (settings) then add static function to urlpattern using the + sign 
 # Next we can go to the category list to add some categories by clicking the ADD CATEGORY button.
 # When you add a category item (just one item for now) including its image, you click on save. you will see a successful message.

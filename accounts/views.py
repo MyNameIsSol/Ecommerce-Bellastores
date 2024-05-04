@@ -130,18 +130,18 @@ def login(request):
             # return redirect('home')
             messages.success(request, 'You are now logged in.') # 187b after we add the message success we can now go to the dashboard.html # 188 in templates/accounts
             #160b return redirect('dashboard') # 187 We will comment redircting to home above and instead, redirect to dashboard when we login adding the message function
-                                        # 160 We will use the request library to direct the user to the required page by installing it with the command. "pip install requests" then we will import "request" at the top. If program did not install, try uninstalling your antivirus(i.e Smadav)
-            url = request.META.get('HTTP_REFERER') # 160c Next we will comment the # 160b redirect code and write the new code for redirecting the user. But wee will first get the url from the browser and assign it to a variable(url),
-            try: # 160d
+                                        # 260 We will use the request library to direct the user to the required page by installing it with the command. "pip install requests" then we will import "request" at the top. If program did not install, try uninstalling your antivirus(i.e Smadav)
+            url = request.META.get('HTTP_REFERER') # 260c Next we will comment the # 260b redirect code and write the new code for redirecting the user. But wee will first get the url from the browser and assign it to a variable(url),
+            try: # 260d
                 # next=/cart/checkout/
-                query = requests.utils.urlparse(url).query # 160e Here we will get the next parameter and its value, assign it to a variable(query)
+                query = requests.utils.urlparse(url).query # 260e Here we will get the next parameter and its value, assign it to a variable(query)
                 # 'next' : '/cart/checkout/'
-                params = dict(x.split('=') for x in query.split('&')) # 160f Here we will seperate(split using = sign) the query variable value as key : value and store it in params as dictionary(array)
-                if 'next' in params: # 160g Next we will direct the user to /cart/checkout/
-                    nextPage = params['next'] # 160gi
-                    return redirect(nextPage) # 160gii
-            except: # 160di
-                return redirect('dashboard')  # 160h If the try block fail, we can direct the user to the dashboard. Next we need to see the cart items in the checkout page, So we will fix that by going to the checkout() function in the views.py # 161 file of the cart app
+                params = dict(x.split('=') for x in query.split('&')) # 260f Here we will seperate(split using = sign) the query variable value as key : value and store it in params as dictionary(array)
+                if 'next' in params: # 260g Next we will direct the user to /cart/checkout/
+                    nextPage = params['next'] # 260gi
+                    return redirect(nextPage) # 260gii
+            except: # 260di
+                return redirect('dashboard')  # 260h If the try block fail, we can direct the user to the dashboard. Next we need to see the cart items in the checkout page, So we will fix that by going to the checkout() function in the views.py # 261 file of the cart app
 
         else:
             messages.error(request, 'Invalid login credentials.')

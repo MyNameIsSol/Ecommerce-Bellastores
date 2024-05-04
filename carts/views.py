@@ -336,12 +336,14 @@ def checkout(request, total=0, quantity=0, cart_items = None): # 226 We will add
         tax = 0
         grand_total = 0
 
-         # 161 Here we will comment # 227a and # 227b code then we will add condition to check if the user is logged in so we will display the cart items assigned to the user and not using the cart_id in the session
-        if request.user.is_authenticated: # 161b
-            cart_items = CartItem.objects.filter(user=request.user, is_active = True) # 161c
+         # 261 Here we will comment # 227a and # 227b code then we will add condition to check if the user is logged in so we will display the cart items assigned to the user and not using the cart_id in the session
+        if request.user.is_authenticated: # 261b
+            cart_items = CartItem.objects.filter(user=request.user, is_active = True) # 261c
         else:
-            cart = Cart.objects.get(cart_id = _cart_id(request)) # 161d
-            cart_items = CartItem.objects.filter(cart=cart, is_active = True) # 161e Now if we refresh the checkout page, we will see the cart items. Next we will want the place order button to be functional. To do that, we will first create and order app which we will then create the models(tables) to store the order informations. 
+            cart = Cart.objects.get(cart_id = _cart_id(request)) # 261d
+            cart_items = CartItem.objects.filter(cart=cart, is_active = True) # 261e Now if we refresh the checkout page, we will see the cart items. Next we will want the place order button to be functional. To do that, we will first create an order app which we will then create the models(tables) to store the order informations. 
+                                                                            # 262 We will create a new app by running the code "python manage.py startapp orders"
+                                                                            # 263 Next is to goto the settings.py # 264 file of the project folder to link the orders app in the list of installed app
 
         # 227a We will get the card_id(product session_id of the browser stored in the Cart table)
         # cart = Cart.objects.get(cart_id = _cart_id(request))
